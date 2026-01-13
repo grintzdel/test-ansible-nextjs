@@ -71,13 +71,13 @@ export default function ContactPage() {
             href="/"
             className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           >
-            ← Retour à l'accueil
+            ← Retour à l&apos;accueil
           </Link>
           <h1 className="text-3xl font-bold text-black dark:text-white mt-4">
             Contactez-nous
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            Nous serions ravis d'avoir de vos nouvelles. Remplissez le formulaire ci-dessous.
+            Nous serions ravis d&apos;avoir de vos nouvelles. Remplissez le formulaire ci-dessous.
           </p>
         </div>
 
