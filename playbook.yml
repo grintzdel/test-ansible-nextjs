@@ -35,8 +35,8 @@
         state: present
         update_cache: yes
 
-    - name: Nettoyer le répertoire
-      shell: rm -rf {{ app_dir }}
+    - name: Forcer la suppression du répertoire
+      shell: rm -rf {{ app_dir }} && mkdir -p {{ app_dir }} && chown {{ ansible_user }}:{{ ansible_user }} {{ app_dir }}
 
     - name: Cloner le code
       shell: git clone {{ repo_url }} {{ app_dir }}
