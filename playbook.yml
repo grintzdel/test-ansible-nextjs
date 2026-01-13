@@ -35,12 +35,12 @@
         state: present
         update_cache: yes
 
-    - name: Forcer la suppression du répertoire
-      shell: rm -rf {{ app_dir }} && mkdir -p {{ app_dir }} && chown {{ ansible_user }}:{{ ansible_user }} {{ app_dir }}
-
-    - name: Cloner le code
-      shell: git clone {{ repo_url }} {{ app_dir }}
-      become_user: "{{ ansible_user }}"
+    - name: Déployer le code
+      shell: |
+        set -e
+        rm -rf /home/{{ ansible_user }}/my-app
+        git clone {{ repo_url }} /home/{{ ansible_user }}/my-app
+        chown -R {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/my-app
 
     - name: Installer les dépendances npm
       npm:
