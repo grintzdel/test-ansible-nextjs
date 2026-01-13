@@ -27,17 +27,21 @@
         global: yes
         state: present
 
-    - name: Déployer le code
-      become_user: "{{ deploy_user }}"
+    - name: Nettoyer le home directory
       shell: |
-        cd ~
-        rm -rf {{ app_name }}-new
-        git clone https://github.com/grintzdel/test-ansible-nextjs {{ app_name }}-new
-        rm -rf {{ app_name }}-old
-        if [ -d "{{ app_name }}" ]; then
-          mv {{ app_name }} {{ app_name }}-old
-        fi
-        mv {{ app_name }}-new {{ app_name }}
+        rm -rf /home/{{ deploy_user }}/nextjs-app*
+        rm -rf /home/{{ deploy_user }}/.git
+
+    - name: Cloner dans /tmp
+      shell: |
+        rm -rf /tmp/nextjs-deploy
+        git clone https://github.com/grintzdel/test-ansible-nextjs /tmp/nextjs-deploy
+
+    - name: Copier vers le home
+      shell: |
+        cp -r /tmp/nextjs-deploy /home/{{ deploy_user }}/{{ app_name }}
+        chown -R {{ deploy_user }}:{{ deploy_user }} /home/{{ deploy_user }}/{{ app_name }}
+        rm -rf /tmp/nextjs-deploy
 
     - name: Installer les dépendances
       become_user: "{{ deploy_user }}"
