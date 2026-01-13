@@ -35,6 +35,19 @@
         state: present
         update_cache: yes
 
+    - name: Vérifier si le répertoire git est valide
+      stat:
+        path: "{{ app_dir }}/.git"
+      register: git_dir
+      become_user: "{{ ansible_user }}"
+
+    - name: Supprimer le répertoire si git est corrompu
+      file:
+        path: "{{ app_dir }}"
+        state: absent
+      when: git_dir.stat.exists
+      become_user: "{{ ansible_user }}"
+
     - name: Cloner ou mettre à jour le repository
       git:
         repo: "{{ repo_url }}"
