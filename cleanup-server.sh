@@ -3,7 +3,7 @@
 # Script de nettoyage rapide du serveur
 
 SERVER="34.39.56.246"
-USER="user"
+USER="mathis.oudin-gcp"
 KEY="~/.ssh/gcp_nextjs"
 
 echo "🧹 Nettoyage du serveur $SERVER..."
