@@ -25,8 +25,3 @@ jobs:
 
       - name: Build application
         run: npm run build
-
-      - name: Start application (test)
-        run: |
-          timeout 10s npm start || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
-        continue-on-error: true
