@@ -1,80 +1,74 @@
 - hosts: serveurs
   become: yes
   vars:
-    app_dir: /home/{{ ansible_user }}/my-app
-    repo_url: https://github.com/grintzdel/test-ansible-nextjs
-    node_version: "20"
+    app_name: nextjs-app
+    deploy_user: mathis.oudin-gcp
 
   tasks:
-    - name: Vérifier la connexion
-      ping:
-
-    - name: Installer les dépendances de base
+    - name: Installer Node.js et dépendances
       apt:
         name:
           - curl
           - git
-          - ca-certificates
-          - gnupg
         state: present
         update_cache: yes
 
-    - name: Télécharger le script d'installation NodeSource
-      shell: curl -fsSL https://deb.nodesource.com/setup_{{ node_version }}.x -o /tmp/nodesource_setup.sh
-      args:
-        creates: /tmp/nodesource_setup.sh
-
-    - name: Exécuter le script NodeSource
-      shell: bash /tmp/nodesource_setup.sh
-      args:
-        creates: /etc/apt/sources.list.d/nodesource.list
-
-    - name: Installer Node.js
-      apt:
-        name: nodejs
-        state: present
-        update_cache: yes
-
-    - name: Déployer le code
+    - name: Installer Node.js 20
       shell: |
-        set -e
-        rm -rf /home/{{ ansible_user }}/my-app
-        git clone {{ repo_url }} /home/{{ ansible_user }}/my-app
-        chown -R {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/my-app
-
-    - name: Installer les dépendances npm
-      npm:
-        path: "{{ app_dir }}"
-        state: present
-      become_user: "{{ ansible_user }}"
-
-    - name: Build l'application Next.js
-      command: npm run build
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+        apt-get install -y nodejs
       args:
-        chdir: "{{ app_dir }}"
-      become_user: "{{ ansible_user }}"
+        creates: /usr/bin/node
 
-    - name: Installer PM2 globalement
+    - name: Installer PM2
       npm:
         name: pm2
         global: yes
         state: present
 
-    - name: Arrêter l'application si elle tourne
-      command: pm2 delete my-app
-      ignore_errors: yes
-      become_user: "{{ ansible_user }}"
+    - name: Créer le répertoire de déploiement
+      file:
+        path: /var/www/{{ app_name }}
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0755'
 
-    - name: Démarrer l'application avec PM2
-      command: pm2 start npm --name "my-app" -- start
+    - name: Déployer le code
+      become_user: "{{ deploy_user }}"
+      shell: |
+        cd /var/www
+        rm -rf {{ app_name }}-new
+        git clone https://github.com/grintzdel/test-ansible-nextjs {{ app_name }}-new
+        rm -rf {{ app_name }}-old
+        if [ -d "{{ app_name }}" ]; then
+          mv {{ app_name }} {{ app_name }}-old
+        fi
+        mv {{ app_name }}-new {{ app_name }}
+
+    - name: Installer les dépendances
+      become_user: "{{ deploy_user }}"
+      shell: npm install
       args:
-        chdir: "{{ app_dir }}"
-      become_user: "{{ ansible_user }}"
+        chdir: /var/www/{{ app_name }}
 
-    - name: Sauvegarder la configuration PM2
-      command: pm2 save
-      become_user: "{{ ansible_user }}"
+    - name: Build l'application
+      become_user: "{{ deploy_user }}"
+      shell: npm run build
+      args:
+        chdir: /var/www/{{ app_name }}
 
-    - name: Configurer PM2 pour démarrer au boot
-      command: pm2 startup systemd -u {{ ansible_user }} --hp /home/{{ ansible_user }}
-      become_user: "{{ ansible_user }}"
+    - name: Redémarrer l'application
+      become_user: "{{ deploy_user }}"
+      shell: |
+        pm2 delete {{ app_name }} || true
+        pm2 start npm --name "{{ app_name }}" -- start
+        pm2 save
+      args:
+        chdir: /var/www/{{ app_name }}
+
+    - name: Setup PM2 startup
+      shell: |
+        pm2 startup systemd -u {{ deploy_user }} --hp /home/{{ deploy_user }}
+      become_user: "{{ deploy_user }}"
+      ignore_errors: yes
