@@ -1,0 +1,74 @@
+- hosts: serveurs
+  become: yes
+  vars:
+    app_dir: /home/{{ ansible_user }}/my-app
+    repo_url: https://github.com/grintzdel/test-ansible-nextjs
+    node_version: "20"
+
+  tasks:
+    - name: Vérifier la connexion
+      ping:
+
+    - name: Installer Node.js et npm
+      apt:
+        name:
+          - nodejs
+          - npm
+        state: present
+        update_cache: yes
+
+    - name: Installer n (Node version manager)
+      npm:
+        name: n
+        global: yes
+        state: present
+
+    - name: Installer Node.js version {{ node_version }}
+      shell: n {{ node_version }}
+      args:
+        creates: /usr/local/n/versions/node/{{ node_version }}
+
+    - name: Cloner ou mettre à jour le repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+      become_user: "{{ ansible_user }}"
+
+    - name: Installer les dépendances npm
+      npm:
+        path: "{{ app_dir }}"
+        state: present
+      become_user: "{{ ansible_user }}"
+
+    - name: Build l'application Next.js
+      command: npm run build
+      args:
+        chdir: "{{ app_dir }}"
+      become_user: "{{ ansible_user }}"
+
+    - name: Installer PM2 globalement
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Arrêter l'application si elle tourne
+      command: pm2 delete my-app
+      ignore_errors: yes
+      become_user: "{{ ansible_user }}"
+
+    - name: Démarrer l'application avec PM2
+      command: pm2 start npm --name "my-app" -- start
+      args:
+        chdir: "{{ app_dir }}"
+      become_user: "{{ ansible_user }}"
+
+    - name: Sauvegarder la configuration PM2
+      command: pm2 save
+      become_user: "{{ ansible_user }}"
+
+    - name: Configurer PM2 pour démarrer au boot
+      command: pm2 startup systemd -u {{ ansible_user }} --hp /home/{{ ansible_user }}
+      become_user: "{{ ansible_user }}"
