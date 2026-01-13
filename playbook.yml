@@ -7,7 +7,7 @@
   tasks:
     - name: Installer dépendances système
       apt:
-        name: [curl, git]
+        name: [curl, rsync]
         state: present
         update_cache: yes
 
@@ -21,16 +21,34 @@
         name: pm2
         global: yes
 
-    - name: Déployer
-      shell: |
-        rm -rf "{{ app_dir }}"
-        git clone https://github.com/grintzdel/test-ansible-nextjs "{{ app_dir }}"
-        chown -R {{ deploy_user }}:{{ deploy_user }} "{{ app_dir }}"
+    - name: Créer le répertoire app
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+
+    - name: Copier les fichiers
+      synchronize:
+        src: "{{ playbook_dir }}/"
+        dest: "{{ app_dir }}"
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=node_modules"
+          - "--exclude=.next"
+        delete: yes
+
+    - name: Fixer les permissions
+      file:
+        path: "{{ app_dir }}"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        recurse: yes
 
     - name: Build
       shell: |
-        rm -rf .next/lock
-        npm install && npm run build
+        npm install
+        npm run build
       args:
         chdir: "{{ app_dir }}"
       become_user: "{{ deploy_user }}"
