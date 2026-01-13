@@ -35,14 +35,11 @@
         state: present
         update_cache: yes
 
-    - name: Déployer le code
-      shell: |
-        if [ -d "{{ app_dir }}/.git" ]; then
-          cd {{ app_dir }} && git pull origin main
-        else
-          rm -rf {{ app_dir }}
-          git clone {{ repo_url }} {{ app_dir }}
-        fi
+    - name: Nettoyer le répertoire
+      shell: rm -rf {{ app_dir }}
+
+    - name: Cloner le code
+      shell: git clone {{ repo_url }} {{ app_dir }}
       become_user: "{{ ansible_user }}"
 
     - name: Installer les dépendances npm
