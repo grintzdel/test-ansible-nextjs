@@ -35,16 +35,14 @@
         state: present
         update_cache: yes
 
-    - name: Supprimer le répertoire existant pour un clone propre
+    - name: Supprimer le répertoire existant
       shell: rm -rf "{{ app_dir }}"
-      become_user: "{{ ansible_user }}"
 
-    - name: Cloner ou mettre à jour le repository
+    - name: Cloner le repository
       git:
         repo: "{{ repo_url }}"
         dest: "{{ app_dir }}"
         version: main
-        force: yes
       become_user: "{{ ansible_user }}"
 
     - name: Installer les dépendances npm
