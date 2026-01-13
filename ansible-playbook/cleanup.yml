@@ -1,0 +1,29 @@
+- hosts: webserver
+  tasks:
+    - name: Arrêter toutes les applications PM2
+      shell: pm2 delete all || true
+      ignore_errors: yes
+
+    - name: Tuer tous les processus Node.js
+      shell: killall node || true
+      become: yes
+      ignore_errors: yes
+
+    - name: Tuer tous les processus sur le port 3000
+      shell: |
+        lsof -ti:3000 | xargs kill -9 || true
+      become: yes
+      ignore_errors: yes
+
+    - name: Nettoyer la liste des processus PM2
+      shell: pm2 flush && pm2 save --force
+      ignore_errors: yes
+
+    - name: Vérifier les ports ouverts
+      shell: netstat -tuln | grep 3000 || echo "Port 3000 is free"
+      register: port_check
+      ignore_errors: yes
+
+    - name: Afficher le statut des ports
+      debug:
+        var: port_check.stdout_lines
