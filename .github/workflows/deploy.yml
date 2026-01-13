@@ -1,26 +1,21 @@
-name: Deploy
+name: Deploy Next.js App
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Récupérer le code
+        uses: actions/checkout@v2
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/gcp_nextjs
-          chmod 600 ~/.ssh/gcp_nextjs
-          ssh-keyscan -H 34.39.56.246 >> ~/.ssh/known_hosts
-
-      - name: Install Ansible
-        run: sudo apt-get update && sudo apt-get install -y ansible
-
-      - name: Deploy
-        run: ansible-playbook -i inventory.ini playbook.yml
+      - name: Exécuter Ansible
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: ansible-playbook/deploy.yml
+          inventory: ansible-playbook/inventory.ini
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_user: user

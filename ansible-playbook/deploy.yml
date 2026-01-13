@@ -1,0 +1,22 @@
+- hosts: webserver
+  tasks:
+    - name: Cloner le projet
+      git:
+        repo: 'https://github.com/grintzdel/test-ansible-nextjs.git'
+        dest: /home/user/test-ansible-nextjs
+        version: main
+
+    - name: Installer les dépendances
+      command: npm install
+      args:
+        chdir: /home/user/test-ansible-nextjs
+
+    - name: Générer le build
+      command: npm run build
+      args:
+        chdir: /home/user/test-ansible-nextjs
+
+    - name: Lancer Next.js en mode production
+      command: npm start
+      args:
+        chdir: /home/user/test-ansible-nextjs
