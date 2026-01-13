@@ -9,24 +9,31 @@
     - name: Vérifier la connexion
       ping:
 
-    - name: Installer Node.js et npm
+    - name: Installer les dépendances de base
       apt:
         name:
-          - nodejs
-          - npm
+          - curl
+          - git
+          - ca-certificates
+          - gnupg
         state: present
         update_cache: yes
 
-    - name: Installer n (Node version manager)
-      npm:
-        name: n
-        global: yes
-        state: present
-
-    - name: Installer Node.js version {{ node_version }}
-      shell: n {{ node_version }}
+    - name: Télécharger le script d'installation NodeSource
+      shell: curl -fsSL https://deb.nodesource.com/setup_{{ node_version }}.x -o /tmp/nodesource_setup.sh
       args:
-        creates: /usr/local/n/versions/node/{{ node_version }}
+        creates: /tmp/nodesource_setup.sh
+
+    - name: Exécuter le script NodeSource
+      shell: bash /tmp/nodesource_setup.sh
+      args:
+        creates: /etc/apt/sources.list.d/nodesource.list
+
+    - name: Installer Node.js
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
 
     - name: Cloner ou mettre à jour le repository
       git:
