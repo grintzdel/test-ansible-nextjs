@@ -3,6 +3,7 @@
   vars:
     app_name: nextjs-app
     deploy_user: mathis.oudin-gcp
+    app_dir: /home/mathis.oudin-gcp/{{ app_name }}
 
   tasks:
     - name: Installer Node.js et dépendances
@@ -26,18 +27,10 @@
         global: yes
         state: present
 
-    - name: Créer le répertoire de déploiement
-      file:
-        path: /var/www/{{ app_name }}
-        state: directory
-        owner: "{{ deploy_user }}"
-        group: "{{ deploy_user }}"
-        mode: '0755'
-
     - name: Déployer le code
       become_user: "{{ deploy_user }}"
       shell: |
-        cd /var/www
+        cd ~
         rm -rf {{ app_name }}-new
         git clone https://github.com/grintzdel/test-ansible-nextjs {{ app_name }}-new
         rm -rf {{ app_name }}-old
@@ -50,13 +43,13 @@
       become_user: "{{ deploy_user }}"
       shell: npm install
       args:
-        chdir: /var/www/{{ app_name }}
+        chdir: "{{ app_dir }}"
 
     - name: Build l'application
       become_user: "{{ deploy_user }}"
       shell: npm run build
       args:
-        chdir: /var/www/{{ app_name }}
+        chdir: "{{ app_dir }}"
 
     - name: Redémarrer l'application
       become_user: "{{ deploy_user }}"
@@ -65,7 +58,7 @@
         pm2 start npm --name "{{ app_name }}" -- start
         pm2 save
       args:
-        chdir: /var/www/{{ app_name }}
+        chdir: "{{ app_dir }}"
 
     - name: Setup PM2 startup
       shell: |
