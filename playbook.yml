@@ -35,17 +35,8 @@
         state: present
         update_cache: yes
 
-    - name: Vérifier si le répertoire de l'application existe
-      stat:
-        path: "{{ app_dir }}"
-      register: app_dir_check
-      become_user: "{{ ansible_user }}"
-
     - name: Supprimer le répertoire existant pour un clone propre
-      file:
-        path: "{{ app_dir }}"
-        state: absent
-      when: app_dir_check.stat.exists
+      shell: rm -rf "{{ app_dir }}"
       become_user: "{{ ansible_user }}"
 
     - name: Cloner ou mettre à jour le repository
