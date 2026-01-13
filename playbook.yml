@@ -28,7 +28,9 @@
         chown -R {{ deploy_user }}:{{ deploy_user }} "{{ app_dir }}"
 
     - name: Build
-      shell: npm install && npm run build
+      shell: |
+        rm -rf .next/lock
+        npm install && npm run build
       args:
         chdir: "{{ app_dir }}"
       become_user: "{{ deploy_user }}"
