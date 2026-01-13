@@ -35,12 +35,14 @@
         state: present
         update_cache: yes
 
-    - name: Cloner ou mettre à jour le code
-      git:
-        repo: "{{ repo_url }}"
-        dest: "{{ app_dir }}"
-        version: main
-        update: yes
+    - name: Déployer le code
+      shell: |
+        if [ -d "{{ app_dir }}/.git" ]; then
+          cd {{ app_dir }} && git pull origin main
+        else
+          rm -rf {{ app_dir }}
+          git clone {{ repo_url }} {{ app_dir }}
+        fi
       become_user: "{{ ansible_user }}"
 
     - name: Installer les dépendances npm
