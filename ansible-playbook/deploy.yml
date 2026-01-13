@@ -1,10 +1,31 @@
 - hosts: webserver
   tasks:
+    - name: Installer PM2 globalement
+      npm:
+        name: pm2
+        global: yes
+        state: present
+      become: yes
+
+    - name: Arrêter l'ancienne application PM2
+      shell: pm2 delete test-ansible-nextjs || true
+      args:
+        chdir: /home/user
+      ignore_errors: yes
+
+    - name: Tuer tous les processus Node.js sur le port 3000
+      shell: |
+        lsof -ti:3000 | xargs kill -9 || true
+      become: yes
+      ignore_errors: yes
+
     - name: Cloner le projet
       git:
         repo: 'https://github.com/grintzdel/test-ansible-nextjs.git'
         dest: /home/user/test-ansible-nextjs
         version: main
+        update: yes
+        force: yes
 
     - name: Installer les dépendances
       command: npm install
@@ -16,7 +37,17 @@
       args:
         chdir: /home/user/test-ansible-nextjs
 
-    - name: Lancer Next.js en mode production
-      command: npm start
+    - name: Lancer Next.js avec PM2
+      shell: pm2 start npm --name test-ansible-nextjs -- start
       args:
         chdir: /home/user/test-ansible-nextjs
+
+    - name: Sauvegarder la configuration PM2
+      command: pm2 save
+      args:
+        chdir: /home/user/test-ansible-nextjs
+
+    - name: Configurer PM2 pour démarrer au boot
+      shell: pm2 startup systemd -u user --hp /home/user || true
+      become: yes
+      ignore_errors: yes
