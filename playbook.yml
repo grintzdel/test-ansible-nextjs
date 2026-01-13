@@ -1,23 +1,18 @@
 - hosts: serveurs
   become: yes
   vars:
-    app_name: nextjs-app
     deploy_user: mathis.oudin-gcp
-    app_dir: /home/mathis.oudin-gcp/{{ app_name }}
+    app_dir: /home/mathis.oudin-gcp/app
 
   tasks:
-    - name: Installer Node.js et dépendances
+    - name: Installer dépendances système
       apt:
-        name:
-          - curl
-          - git
+        name: [curl, git]
         state: present
         update_cache: yes
 
     - name: Installer Node.js 20
-      shell: |
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-        apt-get install -y nodejs
+      shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
       args:
         creates: /usr/bin/node
 
@@ -25,47 +20,21 @@
       npm:
         name: pm2
         global: yes
-        state: present
 
-    - name: Nettoyer le home directory
+    - name: Déployer
       shell: |
-        rm -rf /home/{{ deploy_user }}/nextjs-app*
-        rm -rf /home/{{ deploy_user }}/.git
+        rm -rf "{{ app_dir }}"
+        git clone https://github.com/grintzdel/test-ansible-nextjs "{{ app_dir }}"
+        chown -R {{ deploy_user }}:{{ deploy_user }} "{{ app_dir }}"
 
-    - name: Cloner dans /tmp
-      shell: |
-        rm -rf /tmp/nextjs-deploy
-        git clone https://github.com/grintzdel/test-ansible-nextjs /tmp/nextjs-deploy
-
-    - name: Copier vers le home
-      shell: |
-        cp -r /tmp/nextjs-deploy /home/{{ deploy_user }}/{{ app_name }}
-        chown -R {{ deploy_user }}:{{ deploy_user }} /home/{{ deploy_user }}/{{ app_name }}
-        rm -rf /tmp/nextjs-deploy
-
-    - name: Installer les dépendances
-      become_user: "{{ deploy_user }}"
-      shell: npm install
+    - name: Build
+      shell: npm install && npm run build
       args:
         chdir: "{{ app_dir }}"
-
-    - name: Build l'application
       become_user: "{{ deploy_user }}"
-      shell: npm run build
+
+    - name: Start app
+      shell: pm2 delete app || true && pm2 start npm --name app -- start && pm2 save
       args:
         chdir: "{{ app_dir }}"
-
-    - name: Redémarrer l'application
       become_user: "{{ deploy_user }}"
-      shell: |
-        pm2 delete {{ app_name }} || true
-        pm2 start npm --name "{{ app_name }}" -- start
-        pm2 save
-      args:
-        chdir: "{{ app_dir }}"
-
-    - name: Setup PM2 startup
-      shell: |
-        pm2 startup systemd -u {{ deploy_user }} --hp /home/{{ deploy_user }}
-      become_user: "{{ deploy_user }}"
-      ignore_errors: yes
