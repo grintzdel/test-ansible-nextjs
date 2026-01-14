@@ -41,18 +41,18 @@
 
     - name: Vérifier si le dossier du projet existe
       stat:
-        path: "{{ app_dir }}"
+        path: '{{ app_dir }}'
       register: project_dir
 
     - name: Supprimer le dossier existant s'il appartient à root
       file:
-        path: "{{ app_dir }}"
+        path: '{{ app_dir }}'
         state: absent
       when: project_dir.stat.exists and project_dir.stat.pw_name == 'root'
 
     - name: Créer le dossier parent si nécessaire
       file:
-        path: "/home/mathis.oudin-gcp"
+        path: '/home/mathis.oudin-gcp'
         state: directory
         owner: mathis.oudin-gcp
         group: mathis.oudin-gcp
@@ -60,27 +60,27 @@
 
     - name: Cloner ou mettre à jour le repository
       git:
-        repo: "{{ repo_url }}"
-        dest: "{{ app_dir }}"
-        version: "{{ repo_branch }}"
+        repo: '{{ repo_url }}'
+        dest: '{{ app_dir }}'
+        version: '{{ repo_branch }}'
         force: yes
       become_user: mathis.oudin-gcp
 
     - name: S'assurer que tous les fichiers appartiennent à mathis.oudin-gcp
       file:
-        path: "{{ app_dir }}"
+        path: '{{ app_dir }}'
         owner: mathis.oudin-gcp
         group: mathis.oudin-gcp
         recurse: yes
 
     - name: Vérifier que le dossier existe
       stat:
-        path: "{{ app_dir }}"
+        path: '{{ app_dir }}'
       register: app_dir_stat
 
     - name: Afficher le statut du dossier
       debug:
-        msg: "Le dossier {{ app_dir }} existe: {{ app_dir_stat.stat.exists }}"
+        msg: 'Le dossier {{ app_dir }} existe: {{ app_dir_stat.stat.exists }}'
 
     - name: Installer PM2 globalement
       npm:
@@ -90,14 +90,14 @@
 
     - name: Installer les dépendances du projet
       npm:
-        path: "{{ app_dir }}"
+        path: '{{ app_dir }}'
         state: present
       become_user: mathis.oudin-gcp
 
     - name: Générer le build Next.js
       command: npm run build
       args:
-        chdir: "{{ app_dir }}"
+        chdir: '{{ app_dir }}'
       become_user: mathis.oudin-gcp
 
     - name: Arrêter l'application PM2 si elle existe
@@ -108,9 +108,9 @@
     - name: Démarrer l'application avec PM2
       command: pm2 start npm --name "{{ app_name }}" -- start
       args:
-        chdir: "{{ app_dir }}"
+        chdir: '{{ app_dir }}'
       environment:
-        PORT: "{{ app_port }}"
+        PORT: '{{ app_port }}'
       become_user: mathis.oudin-gcp
 
     - name: Sauvegarder la configuration PM2
@@ -129,4 +129,4 @@
 
     - name: Afficher le statut PM2
       debug:
-        msg: "{{ pm2_status.stdout_lines }}"
+        msg: '{{ pm2_status.stdout_lines }}'
