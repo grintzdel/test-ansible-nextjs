@@ -42,7 +42,7 @@ export const Footer: React.FC = (): React.JSX.Element => {
           </ul>
           <Link
             href="/"
-            className="p-3 rounded-full text-[#2E4F21] w-fit bg-white"
+            className="p-3 rounded-full text-[#2E4F21] w-fit bg-white text-xs"
           >
             Book An Appointment
           </Link>
