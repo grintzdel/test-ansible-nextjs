@@ -23,18 +23,18 @@
 
     - name: Cloner ou mettre à jour le dépôt Git
       git:
-        repo: 'https://github.com/grintzdel/test-ansible-nextjs.git'
-        dest: '{{ app_dir }}'
+        repo: "https://github.com/grintzdel/test-ansible-nextjs.git"
+        dest: "{{ app_dir }}"
         version: main
         update: yes
         force: yes
-      become_user: '{{ deploy_user }}'
+      become_user: "{{ deploy_user }}"
 
     - name: Installer les dépendances
       shell: npm install
       args:
-        chdir: '{{ app_dir }}'
-      become_user: '{{ deploy_user }}'
+        chdir: "{{ app_dir }}"
+      become_user: "{{ deploy_user }}"
 
     - name: Kill Node.js processes on port 3000
       shell: |
@@ -45,11 +45,11 @@
     - name: Build
       shell: npm run build
       args:
-        chdir: '{{ app_dir }}'
-      become_user: '{{ deploy_user }}'
+        chdir: "{{ app_dir }}"
+      become_user: "{{ deploy_user }}"
 
     - name: Start app
       shell: nohup npm start > /dev/null 2>&1 &
       args:
-        chdir: '{{ app_dir }}'
-      become_user: '{{ deploy_user }}'
+        chdir: "{{ app_dir }}"
+      become_user: "{{ deploy_user }}"
