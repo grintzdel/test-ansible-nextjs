@@ -67,6 +67,7 @@ Puis testez dans votre navigateur : http://34.39.56.246:3000
 ## 📋 Ce qui a été corrigé
 
 Le nouveau playbook `ansible-playbook/deploy.yml` :
+
 - ✅ Installe PM2
 - ✅ Arrête les anciens processus avant de déployer
 - ✅ Tue les processus sur le port 3000
@@ -83,6 +84,7 @@ Le nouveau playbook `ansible-playbook/deploy.yml` :
 2. Vérifiez que le secret SSH_PRIVATE_KEY est bien configuré dans GitHub
 
 3. Connectez-vous au serveur et vérifiez :
+
    ```bash
    ssh -i ~/.ssh/gcp_nextjs user@34.39.56.246
 
