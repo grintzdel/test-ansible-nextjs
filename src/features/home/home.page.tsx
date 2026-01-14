@@ -1,3 +1,4 @@
+import CallToActionSection from '@/features/home/components/call-to-action.section'
 import { CaseStudySection } from '@/features/home/components/case-study.section'
 import { HeroSection } from '@/features/home/components/hero.section'
 import { TextTagImageSection } from '@/features/home/components/text-tag-image.section'
@@ -7,6 +8,7 @@ export default function HomePage() {
   return (
     <React.Fragment>
       <HeroSection />
+      <CallToActionSection />
       <TextTagImageSection />
       <CaseStudySection />
     </React.Fragment>
