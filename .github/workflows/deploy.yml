@@ -18,4 +18,3 @@ jobs:
           playbook: ansible-playbook/deploy.yml
           inventory: ansible-playbook/inventory.ini
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_user: mathis.oudin-gcp
