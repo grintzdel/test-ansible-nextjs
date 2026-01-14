@@ -1,30 +1,97 @@
 - hosts: webserver
   become: yes
+  vars:
+    app_name: test-ansible-nextjs
+    app_dir: /home/mathis.oudin-gcp/test-ansible-nextjs
+    app_port: 3001
+    repo_url: https://github.com/grintzdel/test-ansible-nextjs.git
+    repo_branch: main
+
   tasks:
-    - name: Debug - Affiche l'utilisateur courant
-      command: whoami
+    - name: Installer Git si nécessaire
+      apt:
+        name: git
+        state: present
+        update_cache: yes
 
-    - name: Debug - Affiche le répertoire courant
-      command: pwd
-      args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+    - name: Installer Node.js et npm si nécessaire
+      apt:
+        name:
+          - nodejs
+          - npm
+        state: present
 
-    - name: Debug - Liste les fichiers du dossier projet
-      command: ls -la
-      args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+    - name: Vérifier la version de Node.js
+      command: node --version
+      register: node_version
+      changed_when: false
 
-    - name: Installer les dépendances
-      command: npm install
-      args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+    - name: Afficher la version de Node.js
+      debug:
+        msg: "Node.js version: {{ node_version.stdout }}"
 
-    - name: Générer le build
+    - name: Cloner ou mettre à jour le repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_branch }}"
+        force: yes
+      become_user: mathis.oudin-gcp
+
+    - name: Vérifier que le dossier existe
+      stat:
+        path: "{{ app_dir }}"
+      register: app_dir_stat
+
+    - name: Afficher le statut du dossier
+      debug:
+        msg: "Le dossier {{ app_dir }} existe: {{ app_dir_stat.stat.exists }}"
+
+    - name: Installer PM2 globalement
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Installer les dépendances du projet
+      npm:
+        path: "{{ app_dir }}"
+        state: present
+      become_user: mathis.oudin-gcp
+
+    - name: Générer le build Next.js
       command: npm run build
       args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+        chdir: "{{ app_dir }}"
+      become_user: mathis.oudin-gcp
 
-    - name: Lancer Next.js en mode production
-      shell: nohup PORT=3001 npm start > /dev/null 2>&1 &
+    - name: Arrêter l'application PM2 si elle existe
+      command: pm2 delete {{ app_name }}
+      become_user: mathis.oudin-gcp
+      ignore_errors: yes
+
+    - name: Démarrer l'application avec PM2
+      command: pm2 start npm --name "{{ app_name }}" -- start
       args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+        chdir: "{{ app_dir }}"
+      environment:
+        PORT: "{{ app_port }}"
+      become_user: mathis.oudin-gcp
+
+    - name: Sauvegarder la configuration PM2
+      command: pm2 save
+      become_user: mathis.oudin-gcp
+
+    - name: Configurer PM2 pour démarrer au boot
+      command: pm2 startup systemd -u mathis.oudin-gcp --hp /home/mathis.oudin-gcp
+      become_user: mathis.oudin-gcp
+      ignore_errors: yes
+
+    - name: Vérifier le statut de l'application
+      command: pm2 list
+      become_user: mathis.oudin-gcp
+      register: pm2_status
+
+    - name: Afficher le statut PM2
+      debug:
+        msg: "{{ pm2_status.stdout_lines }}"
