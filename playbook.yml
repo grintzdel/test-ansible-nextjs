@@ -36,6 +36,12 @@
         chdir: "{{ app_dir }}"
       become_user: "{{ deploy_user }}"
 
+    - name: Kill Node.js processes on port 3000
+      shell: |
+        lsof -ti:3000 | xargs kill -9 || true
+      become: yes
+      ignore_errors: yes
+
     - name: Build
       shell: npm run build
       args:
