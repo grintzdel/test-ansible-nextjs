@@ -14,21 +14,30 @@
         state: present
         update_cache: yes
 
-    - name: Installer Node.js et npm si nécessaire
+    - name: Vérifier si Node.js est installé
+      command: node --version
+      register: node_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Vérifier si npm est installé
+      command: npm --version
+      register: npm_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Afficher les versions installées
+      debug:
+        msg: "Node.js: {{ node_check.stdout | default('Non installé') }}, npm: {{ npm_check.stdout | default('Non installé') }}"
+
+    - name: Installer Node.js et npm via apt si non installés
       apt:
         name:
           - nodejs
           - npm
         state: present
-
-    - name: Vérifier la version de Node.js
-      command: node --version
-      register: node_version
-      changed_when: false
-
-    - name: Afficher la version de Node.js
-      debug:
-        msg: "Node.js version: {{ node_version.stdout }}"
+      when: node_check.rc != 0 or npm_check.rc != 0
+      ignore_errors: yes
 
     - name: Cloner ou mettre à jour le repository
       git:
