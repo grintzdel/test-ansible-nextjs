@@ -1,6 +1,19 @@
 - hosts: webserver
   become: yes
   tasks:
+    - name: Debug - Affiche l'utilisateur courant
+      command: whoami
+
+    - name: Debug - Affiche le répertoire courant
+      command: pwd
+      args:
+        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+
+    - name: Debug - Liste les fichiers du dossier projet
+      command: ls -la
+      args:
+        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
+
     - name: Installer les dépendances
       command: npm install
       args:
