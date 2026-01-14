@@ -39,6 +39,25 @@
       when: node_check.rc != 0 or npm_check.rc != 0
       ignore_errors: yes
 
+    - name: Vérifier si le dossier du projet existe
+      stat:
+        path: "{{ app_dir }}"
+      register: project_dir
+
+    - name: Supprimer le dossier existant s'il appartient à root
+      file:
+        path: "{{ app_dir }}"
+        state: absent
+      when: project_dir.stat.exists and project_dir.stat.pw_name == 'root'
+
+    - name: Créer le dossier parent si nécessaire
+      file:
+        path: "/home/mathis.oudin-gcp"
+        state: directory
+        owner: mathis.oudin-gcp
+        group: mathis.oudin-gcp
+        mode: '0755'
+
     - name: Cloner ou mettre à jour le repository
       git:
         repo: "{{ repo_url }}"
@@ -46,6 +65,13 @@
         version: "{{ repo_branch }}"
         force: yes
       become_user: mathis.oudin-gcp
+
+    - name: S'assurer que tous les fichiers appartiennent à mathis.oudin-gcp
+      file:
+        path: "{{ app_dir }}"
+        owner: mathis.oudin-gcp
+        group: mathis.oudin-gcp
+        recurse: yes
 
     - name: Vérifier que le dossier existe
       stat:
