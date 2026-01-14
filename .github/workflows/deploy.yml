@@ -12,9 +12,21 @@ jobs:
       - name: Récupérer le code
         uses: actions/checkout@v2
 
-      - name: Exécuter Ansible
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: ansible-playbook/deploy.yml
-          inventory: ansible-playbook/inventory.ini
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Installer Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Créer la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/gcp_nextjs
+          chmod 600 ~/.ssh/gcp_nextjs
+
+      - name: Ajouter l'hôte aux known hosts
+        run: |
+          ssh-keyscan -H 34.39.56.246 >> ~/.ssh/known_hosts
+
+      - name: Exécuter le playbook Ansible
+        run: |
+          ansible-playbook -i ansible-playbook/inventory.ini ansible-playbook/deploy.yml -v
