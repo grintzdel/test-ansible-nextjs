@@ -1,21 +1,16 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image'
+import React from 'react'
 
 type CaseProps = {
-  forLabel: string;
-  title: string;
-  description: string;
-  mediaUrl: string;
-};
+  forLabel: string
+  title: string
+  description: string
+  mediaUrl: string
+}
 
-const Case: React.FC<CaseProps> = ({
-  forLabel,
-  title,
-  description,
-  mediaUrl,
-}: CaseProps): React.JSX.Element => {
+const Case: React.FC<CaseProps> = ({ forLabel, title, description, mediaUrl }: CaseProps): React.JSX.Element => {
   return (
-    <div className="gap-6.25 flex flex-col md:flex-row md:gap-12.5">
+    <div className="flex flex-col gap-6.25 md:flex-row md:gap-12.5">
       <Divider />
       <div className="flex flex-col gap-7.5">
         <Image src={mediaUrl} width={30} height={30} alt={title} />
@@ -24,48 +19,45 @@ const Case: React.FC<CaseProps> = ({
         <p className="text-[#2E4F21]">{description}</p>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const Divider: React.FC = (): React.JSX.Element => {
-  return <div className="h-px w-full bg-[#2E4F21] md:h-full md:w-px" />;
-};
+  return <div className="h-px w-full bg-[#2E4F21] md:h-full md:w-px" />
+}
 
 export const CaseStudySection: React.FC = (): React.JSX.Element => {
   const cases: CaseProps[] = [
     {
-      forLabel: "For Freelancers",
-      title: "Simplicity & Control",
+      forLabel: 'For Freelancers',
+      title: 'Simplicity & Control',
       description:
-        "Stay in charge of your income with seamless expense tracking, automated deductions, and smart tax strategies—so you can focus on doing what you love.",
-      mediaUrl: "/icon-case-study-1.svg",
+        'Stay in charge of your income with seamless expense tracking, automated deductions, and smart tax strategies—so you can focus on doing what you love.',
+      mediaUrl: '/icon-case-study-1.svg',
     },
     {
-      forLabel: "For Families",
-      title: "Stability & Security",
+      forLabel: 'For Families',
+      title: 'Stability & Security',
       description:
-        "From budgeting tools to tax-saving insights, we help you plan for the future, maximize refunds, and keep your household finances running smoothly.",
-      mediaUrl: "/icon-case-study-2.svg",
+        'From budgeting tools to tax-saving insights, we help you plan for the future, maximize refunds, and keep your household finances running smoothly.',
+      mediaUrl: '/icon-case-study-2.svg',
     },
     {
-      forLabel: "For Small Businesses",
-      title: "Stability & Security",
+      forLabel: 'For Small Businesses',
+      title: 'Stability & Security',
       description:
-        "Effortless bookkeeping, payroll solutions, and expert-backed tax support—so you can spend less time on finances and more time scaling your business.",
-      mediaUrl: "/icon-case-study-3.svg",
+        'Effortless bookkeeping, payroll solutions, and expert-backed tax support—so you can spend less time on finances and more time scaling your business.',
+      mediaUrl: '/icon-case-study-3.svg',
     },
-  ];
+  ]
 
   return (
     <section className="flex flex-col gap-40 px-5 py-25">
       <div className="flex flex-col justify-between gap-12.5 md:flex-row">
-        <h2 className="text-6xl tracking-[-2px] text-[#2E4F21]">
-          Smart Finance for everyone
-        </h2>
+        <h2 className="text-6xl tracking-[-2px] text-[#2E4F21]">Smart Finance for everyone</h2>
         <p className="text-[#2E4F21]">
-          At Noble Finance, we believe that financial confidence should be
-          accessible to everyone—whether you&#39;re a solo entrepreneur,
-          managing a growing family, or running a small business.
+          At Noble Finance, we believe that financial confidence should be accessible to everyone—whether you&#39;re a
+          solo entrepreneur, managing a growing family, or running a small business.
         </p>
       </div>
 
@@ -81,5 +73,5 @@ export const CaseStudySection: React.FC = (): React.JSX.Element => {
         ))}
       </div>
     </section>
-  );
-};
+  )
+}

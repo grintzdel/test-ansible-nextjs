@@ -8,18 +8,18 @@ Ce projet utilise **Git Flow** pour la gestion des branches et **GitHub Actions*
 
 ### Branches principales
 
-| Branche | Rôle | Stable ? |
-|---------|------|----------|
-| `main` | Code en production | ✅ Oui |
-| `develop` | Version en développement | ⚠️ Non |
+| Branche   | Rôle                     | Stable ? |
+| --------- | ------------------------ | -------- |
+| `main`    | Code en production       | ✅ Oui   |
+| `develop` | Version en développement | ⚠️ Non   |
 
 ### Branches temporaires
 
-| Type | Origine | Destination | Exemple |
-|------|---------|-------------|---------|
-| `feature/*` | `develop` | `develop` | `feature/42-contact-page` |
-| `release/*` | `develop` | `main` + `develop` | `release/1.0.0` |
-| `hotfix/*` | `main` | `main` + `develop` | `hotfix/critical-bug` |
+| Type        | Origine   | Destination        | Exemple                   |
+| ----------- | --------- | ------------------ | ------------------------- |
+| `feature/*` | `develop` | `develop`          | `feature/42-contact-page` |
+| `release/*` | `develop` | `main` + `develop` | `release/1.0.0`           |
+| `hotfix/*`  | `main`    | `main` + `develop` | `hotfix/critical-bug`     |
 
 ## 🔄 Workflow Git Flow
 
@@ -109,6 +109,7 @@ git branch -d hotfix/critical-security-fix
 **Déclenchement** : Sur tous les push et pull requests
 
 **Jobs** :
+
 1. **Linting** : Vérification du code avec ESLint
 2. **Build** : Compilation de l'application Next.js
 3. **Tests** : Exécution des tests (si présents)
@@ -121,6 +122,7 @@ git branch -d hotfix/critical-security-fix
 **Déclenchement** : Uniquement sur push vers `main`
 
 **Jobs** :
+
 1. **Verify CI** : Vérifie que le code compile et passe le linting
 2. **Deploy** : Déploiement avec Ansible sur le serveur de production
 
@@ -140,15 +142,15 @@ Suivre la convention **Conventional Commits** :
 
 ### Types de commits
 
-| Type | Description |
-|------|-------------|
-| `feat` | Nouvelle fonctionnalité |
-| `fix` | Correction de bug |
-| `docs` | Documentation |
-| `style` | Formatage, pas de changement de code |
-| `refactor` | Refactoring du code |
-| `test` | Ajout ou modification de tests |
-| `chore` | Maintenance, configuration |
+| Type       | Description                          |
+| ---------- | ------------------------------------ |
+| `feat`     | Nouvelle fonctionnalité              |
+| `fix`      | Correction de bug                    |
+| `docs`     | Documentation                        |
+| `style`    | Formatage, pas de changement de code |
+| `refactor` | Refactoring du code                  |
+| `test`     | Ajout ou modification de tests       |
+| `chore`    | Maintenance, configuration           |
 
 ### Exemples
 
