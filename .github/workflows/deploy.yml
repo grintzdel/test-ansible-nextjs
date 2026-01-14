@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Next.js App
 
 on:
   push:
@@ -9,8 +9,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Run Ansible Playbook
+      - name: Récupérer le code
+        uses: actions/checkout@v2
+
+      - name: Exécuter Ansible
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: ansible-playbook/deploy.yml

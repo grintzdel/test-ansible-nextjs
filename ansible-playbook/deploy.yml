@@ -1,30 +1,17 @@
 - hosts: webserver
   become: yes
   tasks:
-    - name: Tuer tous les processus Node.js sur le port 3001
-      shell: |
-        lsof -ti:3001 | xargs kill -9 || true
-      ignore_errors: yes
-
-    - name: Cloner le projet
-      git:
-        repo: "https://github.com/grintzdel/test-ansible-nextjs.git"
-        dest: /home/mathis.oudin-gcp/test-ansible-nextjs
-        version: main
-        update: yes
-        force: yes
-
     - name: Installer les dépendances
-      shell: npm install
+      command: npm install
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
     - name: Générer le build
-      shell: npm run build
+      command: npm run build
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
-    - name: Démarrer l'application sur le port 3001
-      shell: PORT=3001 nohup npm run start > /dev/null 2>&1 &
+    - name: Lancer Next.js en mode production
+      shell: PORT=3001 npm start
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
