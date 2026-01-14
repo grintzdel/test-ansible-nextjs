@@ -12,6 +12,6 @@
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
     - name: Lancer Next.js en mode production
-      shell: PORT=3001 npm start
+      shell: nohup PORT=3001 npm start > /dev/null 2>&1 &
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
