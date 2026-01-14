@@ -5,13 +5,9 @@ const config = {
   bracketSpacing: true,
   singleQuote: true,
   printWidth: 120,
-  trailingComma: "es5",
-  tailwindFunctions: ["clsx", "tw"],
-  plugins: [
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-packagejson",
-  ],
-};
+  trailingComma: 'es5',
+  tailwindFunctions: ['clsx', 'tw'],
+  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss', 'prettier-plugin-packagejson'],
+}
 
-export default config;
+export default config

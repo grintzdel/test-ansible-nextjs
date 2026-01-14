@@ -1,8 +1,8 @@
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-import prettier from "eslint-config-prettier";
-import onlyWarn from "eslint-plugin-only-warn";
-import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import nextTs from 'eslint-config-next/typescript'
+import prettier from 'eslint-config-prettier'
+import onlyWarn from 'eslint-plugin-only-warn'
+import { defineConfig, globalIgnores } from 'eslint/config'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -11,19 +11,19 @@ const eslintConfig = defineConfig([
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "*.js",
-    "node_modules/**",
-    "*.json",
-    "*.md",
-    "*.css",
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    '*.js',
+    'node_modules/**',
+    '*.json',
+    '*.md',
+    '*.css',
   ]),
   {
     plugins: {
-      "only-warn": onlyWarn,
+      'only-warn': onlyWarn,
     },
     languageOptions: {
       globals: {
@@ -33,26 +33,26 @@ const eslintConfig = defineConfig([
       },
     },
     settings: {
-      "import/resolver": {
+      'import/resolver': {
         typescript: {
-          project: "./tsconfig.json",
+          project: './tsconfig.json',
         },
       },
     },
   },
   {
-    files: ["*.js?(x)", "*.ts?(x)"],
+    files: ['*.js?(x)', '*.ts?(x)'],
     rules: {
-      "react/jsx-no-literals": "error",
-      "no-unused-vars": [
-        "warn",
+      'react/jsx-no-literals': 'error',
+      'no-unused-vars': [
+        'warn',
         {
-          varsIgnorePattern: "^I[A-Z].*(Interface|Gateway)$",
+          varsIgnorePattern: '^I[A-Z].*(Interface|Gateway)$',
         },
       ],
-      "@typescript-eslint/prefer-nullish-coalescing": "off",
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
     },
   },
-]);
+])
 
-export default eslintConfig;
+export default eslintConfig
