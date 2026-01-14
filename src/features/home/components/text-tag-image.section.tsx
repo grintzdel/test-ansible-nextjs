@@ -49,7 +49,7 @@ const Card: React.FC<CardProps> = ({
 
 export const TextTagImageSection: React.FC = (): React.JSX.Element => {
   return (
-    <section className="flex flex-col gap-10 px-5">
+    <section className="flex flex-col gap-10 bg-[#F9F9F9] px-5 py-10">
       <Card
         title="Tax Preparation & Filing"
         description="Accurately prepare and file personal and business tax returns to maximize deductions and ensure compliance."
