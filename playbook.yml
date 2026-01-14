@@ -2,7 +2,7 @@
   become: yes
   vars:
     deploy_user: mathis.oudin-gcp
-    app_dir: /home/mathis.oudin-gcp/app
+    app_dir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
   tasks:
     - name: Installer dépendances système
