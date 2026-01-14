@@ -1,53 +1,30 @@
 - hosts: webserver
+  become: yes
   tasks:
-    - name: Installer PM2 globalement
-      npm:
-        name: pm2
-        global: yes
-        state: present
-      become: yes
-
-    - name: Arrêter l'ancienne application PM2
-      shell: pm2 delete test-ansible-nextjs || true
-      args:
-        chdir: /home/mathis.oudin-gcp
-      ignore_errors: yes
-
-    - name: Tuer tous les processus Node.js sur le port 3000
+    - name: Tuer tous les processus Node.js sur le port 3001
       shell: |
-        lsof -ti:3000 | xargs kill -9 || true
-      become: yes
+        lsof -ti:3001 | xargs kill -9 || true
       ignore_errors: yes
 
     - name: Cloner le projet
       git:
-        repo: 'https://github.com/grintzdel/test-ansible-nextjs.git'
+        repo: "https://github.com/grintzdel/test-ansible-nextjs.git"
         dest: /home/mathis.oudin-gcp/test-ansible-nextjs
         version: main
         update: yes
         force: yes
 
     - name: Installer les dépendances
-      command: npm install
+      shell: npm install
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
     - name: Générer le build
-      command: npm run build
+      shell: npm run build
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
 
-    - name: Lancer Next.js avec PM2
-      shell: pm2 start npm --name test-ansible-nextjs -- start
+    - name: Démarrer l'application sur le port 3001
+      shell: PORT=3001 nohup npm run start > /dev/null 2>&1 &
       args:
         chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
-
-    - name: Sauvegarder la configuration PM2
-      command: pm2 save
-      args:
-        chdir: /home/mathis.oudin-gcp/test-ansible-nextjs
-
-    - name: Configurer PM2 pour démarrer au boot
-      shell: pm2 startup systemd -u mathis.oudin-gcp --hp /home/mathis.oudin-gcp || true
-      become: yes
-      ignore_errors: yes
